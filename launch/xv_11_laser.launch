@@ -1,0 +1,4 @@
+<launch>
+	<node name="lidar_scan" pkg="xv_11_laser_driver" type="neato_laser_publisher" args="_port:=/dev/serial0" output="screen" />
+	<node name="lidar_motor" pkg="xv_11_laser_motor_control" type="motor_control.py" output="screen" />
+</launch>
