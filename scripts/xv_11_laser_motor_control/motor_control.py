@@ -22,12 +22,12 @@ class xv11MotorControl:
         self.currentPWM = max(min(newPWM, 100), 0)
         self.motorLidar.ChangeDutyCycle(self.currentPWM)
         self.pwmPublisher.publish(self.currentPWM)
-        rospy.loginfo("Lidar motor PWM modified to %d", self.currentPWM)
+        #rospy.loginfo("Lidar motor PWM modified to %d", self.currentPWM)
 
     def adaptPWM(self, data):
         """Adapt PMW to control lidar speed"""
         rpm = float(data.data)
-        rospy.loginfo("Lidar speed %d RPM, actual PWM %d", rpm, self.currentPWM)
+        #rospy.loginfo("Lidar speed %d RPM, actual PWM %d", rpm, self.currentPWM)
         if rpm > 600:
             rospy.loginfo("Invalid Lidar speed, nothing to do")
         else:
