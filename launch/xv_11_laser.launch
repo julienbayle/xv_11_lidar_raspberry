@@ -4,4 +4,7 @@
 		<remap from="scan" to="/starbaby/laser/scan"/>
 	</node>
 	<node name="lidar_motor" pkg="xv_11_laser_motor_control" type="motor_control.py" output="screen" />
+	<node name="lidar_nearest_point" pkg="xv_11_laser_motor_control" type="nearest_point.py" output="screen">
+		<remap from="scan" to="/starbaby/laser/scan"/>
+        </node>
 </launch>
