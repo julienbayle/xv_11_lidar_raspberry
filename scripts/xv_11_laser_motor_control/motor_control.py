@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+from std_msgs.msg import Bool
 from std_msgs.msg import UInt16
 import RPi.GPIO as GPIO
 
@@ -16,10 +17,14 @@ class xv11MotorControl:
         # only publish motor speed in RPM if motor runs
         self.motorLidar.start(initialPWM)
         self.currentPWM = initialPWM
-    
+        self.laser_active = True
+        self.initialPWM = initialPWM
+
     def updatePWM(self, newPWM):
         """Change PWM value"""
         self.currentPWM = max(min(newPWM, 100), 0)
+        if not self.laser_active:
+          self.currentPWM = 0
         self.motorLidar.ChangeDutyCycle(self.currentPWM)
         self.pwmPublisher.publish(self.currentPWM)
         #rospy.loginfo("Lidar motor PWM modified to %d", self.currentPWM)
@@ -34,14 +39,26 @@ class xv11MotorControl:
             error = 300 - rpm
             self.updatePWM(self.currentPWM + (error / 5))
 
+    def laser_active_cb(self, data):
+        """Enable or disable laser rotation"""
+        if data.data:
+          rospy.loginfo("Starting LIDAR")
+          self.laser_active = True
+          self.updatePWM(self.initialPWM) # Start rotation        
+        else:
+          rospy.loginfo("Stopping LIDAR")
+          self.laser_active = False
+          self.updatePWM(0)
+ 
     def run(self):
         def callback(data):
             return self.adaptPWM(data)
         try:
             rospy.init_node("lidar_motor_control")
             self.pwmPublisher = rospy.Publisher("laser_pwm", UInt16, queue_size=10)
-            rospy.Subscriber("rpms", UInt16, callback)
-
+            rospy.Subscriber("rpms", UInt16, self.adaptPWM)
+            rospy.Subscriber("/starbaby/laser_active", Bool, self.laser_active_cb)
+ 
             # Loop until this node is stopped
             rospy.spin()
     
