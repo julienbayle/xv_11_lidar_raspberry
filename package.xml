@@ -1,19 +1,15 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>xv_11_laser_motor_control</name>
-  <version>0.0.1</version>
-  <description>Speed control XV 11 lidar (laser range finder) form RaspberryPi / ROS</description>
+  <name>xv_11_lidar_raspberry</name>
+  <version>0.0.2</version>
+  <description>XV 11 lidar (laser range finder) with RaspberryPi and ROS</description>
   <maintainer email="jbayle@gmail.com">Julien BAYLE</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <depend>xv_11_laser_driver</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
   
   <export></export>
 </package>

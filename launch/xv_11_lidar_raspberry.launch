@@ -1,0 +1,7 @@
+<launch>
+	<node name="lidar" pkg="xv_11_lidar_raspberry" type="xv_11_lidar_raspberry" output="screen">
+		<param name="port" value="/dev/ttyAMA0"/>
+		<param name="frame_id" value="lidar_link"/>
+		<remap from="scan" to="laser/scan"/>
+	</node>
+</launch>
