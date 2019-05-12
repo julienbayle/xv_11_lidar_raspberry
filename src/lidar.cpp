@@ -22,9 +22,7 @@ namespace xv_11_lidar_raspberry {
 		serial_.set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
 
 		scan_pub_ = n.advertise<sensor_msgs::LaserScan>("scan", 5);
-
     scan_->header.frame_id = frame_id;
-    scan_->header.stamp = ros::Time::now();		
 		scan_->angle_min = 0.0;
 		scan_->angle_max = 2.0*M_PI;
 		scan_->angle_increment = (2.0*M_PI/360.0);
@@ -111,6 +109,7 @@ namespace xv_11_lidar_raspberry {
 	void XV11Lidar::read_frame_handler(const boost::system::error_code& error, size_t bytes_transferred)
 	{
 		//read data in sets of 4
+		scan_->header.stamp = ros::Time::now();		
 		for(uint16_t i = 0; i < raw_bytes_.size(); i=i+22) {
 			if(raw_bytes_[i] == 0xFA && raw_bytes_[i+1] == (0xA0+i/22)) {	// CRC check
 				rpms_ = (raw_bytes_[i+3] << 8 | raw_bytes_[i+2])/64; 
@@ -132,7 +131,7 @@ namespace xv_11_lidar_raspberry {
 		// Update PWM
 		if (rpms_ > 200 && rpms_ < 400)
 		{
-    	pwm_ +=  (300 - rpms_)/3;
+    	pwm_ +=  (300 - rpms_)/1;
 			//ROS_INFO_STREAM("Velocity:" << rpms_ << "PWM: " << pwm_);
 			xv_11_lidar_raspberry::setPwm(pwm_);
 		}
