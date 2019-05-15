@@ -27,10 +27,11 @@ namespace xv_11_lidar_raspberry {
 		scan_->angle_max = 2.0*M_PI;
 		scan_->angle_increment = (2.0*M_PI/360.0);
 		scan_->range_min = 0.06;
-		scan_->range_max = 5.0;
+		scan_->range_max = 3.0;
 		scan_->ranges.resize(360);
 		scan_->intensities.resize(360);
-		scan_->time_increment = 0.2;
+		scan_->scan_time = 0.2;
+		scan_->time_increment = 0.2 / 360;
 
 		sync_frame(0);
 		boost::thread t(boost::bind(&boost::asio::io_service::run, &io_));
