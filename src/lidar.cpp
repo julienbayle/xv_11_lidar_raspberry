@@ -15,6 +15,7 @@ namespace xv_11_lidar_raspberry {
 		initial_pwm_(initial_pwm),
 		io_(),
 		rpms_(0),
+		rpms_acc_(RollingWindow::window_size = 10),
 		scan_(new sensor_msgs::LaserScan),
 		serial_(io_, port) 
 	{
@@ -26,7 +27,7 @@ namespace xv_11_lidar_raspberry {
 		scan_->angle_min = 0.0;
 		scan_->angle_max = 2.0*M_PI;
 		scan_->angle_increment = (2.0*M_PI/360.0);
-		scan_->range_min = 0.06;
+		scan_->range_min = 0.07;
 		scan_->range_max = 3.0;
 		scan_->ranges.resize(360);
 		scan_->intensities.resize(360);
@@ -114,6 +115,7 @@ namespace xv_11_lidar_raspberry {
 		for(uint16_t i = 0; i < raw_bytes_.size(); i=i+22) {
 			if(raw_bytes_[i] == 0xFA && raw_bytes_[i+1] == (0xA0+i/22)) {	// CRC check
 				rpms_ = (raw_bytes_[i+3] << 8 | raw_bytes_[i+2])/64; 
+				rpms_acc_(rpms_);
 		
 				for(uint16_t j = i+4; j < i+20; j=j+4) {
 					int index = (4*i)/22 + (j-4-i)/4;
@@ -130,10 +132,11 @@ namespace xv_11_lidar_raspberry {
 		}
 
 		// Update PWM
-		if (rpms_ > 200 && rpms_ < 400)
+		float avg_rpms = bacc::rolling_mean(rpms_acc_);
+		if (avg_rpms > 200 && avg_rpms < 400)
 		{
-    	pwm_ +=  (300 - rpms_)/1;
-			//ROS_INFO_STREAM("Velocity:" << rpms_ << "PWM: " << pwm_);
+    	pwm_ +=  (300 - avg_rpms)/3;
+			ROS_DEBUG_STREAM("Velocity: " << rpms_ << "Avg velocity: " << avg_rpms << " PWM: " << pwm_);
 			xv_11_lidar_raspberry::setPwm(pwm_);
 		}
 

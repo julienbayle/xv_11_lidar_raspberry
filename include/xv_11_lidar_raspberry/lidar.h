@@ -2,7 +2,12 @@
 #include <sensor_msgs/LaserScan.h>
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/rolling_mean.hpp>
 #include <string>
+
+namespace bacc = boost::accumulators;
 
 namespace xv_11_lidar_raspberry {
     
@@ -25,6 +30,11 @@ namespace xv_11_lidar_raspberry {
         private:
 
             uint16_t rpms_;
+            // RPMS (rolling mean)
+            typedef bacc::accumulator_set<double, bacc::stats<bacc::tag::rolling_mean> > RollingMeanAcc;
+            typedef bacc::tag::rolling_window RollingWindow;
+            RollingMeanAcc rpms_acc_;
+
             int initial_pwm_;
             int pwm_;
 
